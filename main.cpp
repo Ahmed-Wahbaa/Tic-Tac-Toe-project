@@ -8,26 +8,6 @@
 using namespace std;
 
 // ============================================================
-// TIC-TAC-TOE GAME PROJECT - TEAM TEMPLATE
-// Single-file implementation
-//
-// Team size: 7 members
-//
-// IMPORTANT:
-// This file is a TEMPLATE ONLY.
-// The TODO sections are intentionally left for team members.
-//
-// Project requirements are based on the provided specification:
-// - Board class
-// - Abstract Player class
-// - AIPlayer class
-// - Game class
-// - PvP, PvC Easy, PvC Hard
-// - Console user interface
-// ============================================================
-
-
-// ============================================================
 // ENUMERATION
 // ============================================================
 
@@ -323,6 +303,55 @@ Board::Board(int size)
 // Implement board display.
 void Board::display() const
 {
+    // Display column numbers
+    cout << "    ";
+    for (int col = 0; col < size; col++)
+    {
+        cout << col + 1;
+
+        if (col < size - 1)
+        {
+            cout << "   ";
+        }
+    }
+
+    cout << endl;
+
+    // Display rows
+    for (int row = 0; row < size; row++)
+    {
+        cout << row + 1 << "   ";
+
+        for (int col = 0; col < size; col++)
+        {
+            cout << grid[row][col];
+
+            if (col < size - 1)
+            {
+                cout << " | ";
+            }
+        }
+
+        cout << endl;
+
+        // Display horizontal borders
+        if (row < size - 1)
+        {
+            cout << "   ";
+
+            for (int col = 0; col < size; col++)
+            {
+                cout << "---";
+
+                if (col < size - 1)
+                {
+                    cout << "+";
+                }
+            }
+
+            cout << endl;
+        }
+    }
 }
 
 
@@ -330,7 +359,19 @@ void Board::display() const
 // Implement move validation.
 bool Board::isValidMove(int row, int col) const
 {
-    return false;
+    // Check if row and column are inside the board
+    if (row < 0 || row >= size || col < 0 || col >= size)
+    {
+        return false;
+    }
+
+    // Check if the selected cell is empty
+    if (grid[row][col] != ' ')
+    {
+        return false;
+    }
+
+    return true;
 }
 
 
@@ -338,7 +379,16 @@ bool Board::isValidMove(int row, int col) const
 // Implement move placement.
 bool Board::makeMove(int row, int col, char symbol)
 {
-    return false;
+    // Check if the move is valid
+    if (!isValidMove(row, col))
+    {
+        return false;
+    }
+
+    // Place the player's symbol
+    grid[row][col] = symbol;
+
+    return true;
 }
 
 
@@ -346,6 +396,80 @@ bool Board::makeMove(int row, int col, char symbol)
 // Implement win checking.
 bool Board::checkWin(char symbol) const
 {
+    // Check rows
+    for (int row = 0; row < size; row++)
+    {
+        bool win = true;
+
+        for (int col = 0; col < size; col++)
+        {
+            if (grid[row][col] != symbol)
+            {
+                win = false;
+                break;
+            }
+        }
+
+        if (win)
+        {
+            return true;
+        }
+    }
+
+    // Check columns
+    for (int col = 0; col < size; col++)
+    {
+        bool win = true;
+
+        for (int row = 0; row < size; row++)
+        {
+            if (grid[row][col] != symbol)
+            {
+                win = false;
+                break;
+            }
+        }
+
+        if (win)
+        {
+            return true;
+        }
+    }
+
+    // Check main diagonal
+    bool win = true;
+
+    for (int i = 0; i < size; i++)
+    {
+        if (grid[i][i] != symbol)
+        {
+            win = false;
+            break;
+        }
+    }
+
+    if (win)
+    {
+        return true;
+    }
+
+    // Check opposite diagonal
+    win = true;
+
+    for (int i = 0; i < size; i++)
+    {
+        if (grid[i][size - 1 - i] != symbol)
+        {
+            win = false;
+            break;
+        }
+    }
+
+    if (win)
+    {
+        return true;
+    }
+
     return false;
 }
 
@@ -354,7 +478,18 @@ bool Board::checkWin(char symbol) const
 // Implement full-board checking.
 bool Board::isFull() const
 {
-    return false;
+    for (int row = 0; row < size; row++)
+    {
+        for (int col = 0; col < size; col++)
+        {
+            if (grid[row][col] == ' ')
+            {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 
@@ -362,7 +497,7 @@ bool Board::isFull() const
 // Implement getCell.
 char Board::getCell(int row, int col) const
 {
-    return ' ';
+    return grid[row][col];
 }
 
 
@@ -370,6 +505,13 @@ char Board::getCell(int row, int col) const
 // Implement board reset.
 void Board::reset()
 {
+    for (int row = 0; row < size; row++)
+    {
+        for (int col = 0; col < size; col++)
+        {
+            grid[row][col] = ' ';
+        }
+    }
 }
 
 
@@ -578,7 +720,7 @@ void Game::reset()
 
 // ============================================================
 // MAIN FUNCTION
-// Suggested owner: MEMBER 6
+// owner: MEMBER 6
 // ============================================================
 
 int main()
