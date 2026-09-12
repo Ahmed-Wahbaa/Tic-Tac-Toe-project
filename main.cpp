@@ -602,6 +602,7 @@ void AIPlayer::getMove(int& row, int& col)
 // Implement difficulty setter.
 void AIPlayer::setDifficulty(Difficulty newDifficulty)
 {
+    difficulty = newDifficulty;
 }
 
 
@@ -609,6 +610,29 @@ void AIPlayer::setDifficulty(Difficulty newDifficulty)
 // Implement random valid move selection.
 void AIPlayer::getRandomMove(const Board& board, int& row, int& col) const
 {
+    vector<pair<int, int>> availableMoves;
+
+    for (int currentRow = 0; currentRow < board.getSize(); currentRow++)
+    {
+        for (int currentCol = 0; currentCol < board.getSize(); currentCol++)
+        {
+            if (board.getCell(currentRow, currentCol) == ' ')
+            {
+                availableMoves.push_back({currentRow, currentCol});
+            }
+        }
+    }
+
+    if (availableMoves.empty())
+    {
+        row = -1;
+        col = -1;
+        return;
+    }
+
+    int selectedMove = rand() % availableMoves.size();
+    row = availableMoves[selectedMove].first;
+    col = availableMoves[selectedMove].second;
 }
 
 //TODO - MEMBER 5:
