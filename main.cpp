@@ -181,14 +181,29 @@ public:
     // TODO - MEMBER 5:
     // Find the optimal move for HARD difficulty.
     // Research and implement the minimax algorithm as required.
-    void getBestMove(Board& board, int& row, int& col) const;
+    void getBestMove(Board& board, int& row, int& col) const{
+
+    };
 
     // TODO - MEMBER 5:
     // Evaluate the current board:
     // +10 for an AI win
     // -10 for an opponent win
     //  0 for draw/neutral state
-    int evaluateBoard(const Board& board) const;
+    int evaluateBoard(const Board& board) const{
+        //Check first if AI has won
+        if(board.checkWin(this -> symbol)){
+            return 10;
+        }
+        //Check which symbol the human opponent is to determine next steps
+        char oppSymbol = (this -> symbol == 'X') ? 'O' : 'X';
+
+        if(board.checkWin(oppSymbol)){
+            return -10;
+        }
+        return 0;
+
+    };
 };
 
 
