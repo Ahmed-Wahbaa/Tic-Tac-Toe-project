@@ -572,8 +572,25 @@ HumanPlayer::HumanPlayer(const string& name, char symbol)
 
 // TODO - MEMBER 3:
 // Implement human move input.
-void HumanPlayer::getMove(int& row, int& col)
-{
+void HumanPlayer::getMove(int& row, int& col){
+    cout << "Enter row (1-3): ";
+    cin >> row;
+    while (cin.fail() || row < 1 || row > 3) {
+            cout << "Invalid input. Enter row (1-3): ";
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cin >> row;}
+
+    cout << "Enter column (1-3): ";
+    cin >> col;
+
+    while (cin.fail() || col < 1 || col > 3){
+        cout << "Invalid input. Enter column (1-3): ";
+        cin.clear();
+        cin.ignore(1000, '\n');
+        cin >> col;}
+        row--;
+        col--;
 }
 
 
@@ -663,7 +680,7 @@ int runMinimax(Board b, bool isMaximizing, char aiSymbol, char humanSymbol) {
         for (int r = 0; r < size; r++) {
             for (int c = 0; c < size; c++) {
                 if (b.getCell(r, c) == ' ') {
-                    Board nextBoard = b; // Clone board 
+                    Board nextBoard = b; // Clone board
                     nextBoard.makeMove(r, c, humanSymbol);
                     int score = runMinimax(nextBoard, true, aiSymbol, humanSymbol);
                     if (score < bestScore) bestScore = score;
@@ -686,12 +703,12 @@ void AIPlayer::getBestMove(Board& board, int& row, int& col) const
         for (int c = 0; c < size; c++) {
             if (board.getCell(r, c) == ' ') {
                 // Make a copy of the board to simulate moves on it
-                Board tempBoard = board; 
+                Board tempBoard = board;
                 tempBoard.makeMove(r, c, this->symbol);
-                
+
                 // Call the standalone minimax (passing false because it's human's turn next)
                 int moveScore = runMinimax(tempBoard, false, this->symbol, humanSymbol);
-                
+
                 if (moveScore > bestScore) {
                     bestScore = moveScore;
                     row = r;
