@@ -91,7 +91,6 @@ protected:
 
 public:
 
-    // TODO - MEMBER 2:
     // Initialize the player's name and symbol.
     Player(const string& name, char symbol);
 
@@ -99,15 +98,12 @@ public:
     // Derived classes must implement how they select a move.
     virtual void getMove(int& row, int& col) = 0;
 
-    // TODO - MEMBER 2:
     // Return the player's name.
     string getName() const;
 
-    // TODO - MEMBER 2:
     // Return the player's symbol.
     char getSymbol() const;
 
-    // TODO - MEMBER 2:
     // Update the player's name.
     void setName(const string& name);
 
@@ -527,34 +523,32 @@ int Board::getSize() const
 // PLAYER METHOD DEFINITIONS
 // ============================================================
 
-// TODO - MEMBER 2:
 // Implement Player constructor.
 Player::Player(const string& name, char symbol)
-    : name(name), symbol(symbol)
 {
+	this->name = name;
+	this->symbol = symbol;
 }
 
 
-// TODO - MEMBER 2:
 // Implement getName.
 string Player::getName() const
 {
-    return "";
+	return name;
 }
 
 
-// TODO - MEMBER 2:
 // Implement getSymbol.
 char Player::getSymbol() const
 {
-    return ' ';
+	return symbol;
 }
 
 
-// TODO - MEMBER 2:
 // Implement setName.
 void Player::setName(const string& name)
 {
+	this->name = name;
 }
 
 
