@@ -756,6 +756,59 @@ Game::Game()
 // Implement main game flow.
 void Game::start()
 {
+    // Seed the random number generator once for the whole application
+    // (used by AIPlayer::getRandomMove on EASY difficulty).
+    srand(static_cast<unsigned int>(time(nullptr)));
+
+    // The application keeps returning to the main menu until the
+    // user selects "Exit" (which terminates the program directly).
+    while (true)
+    {
+        // Displays the menu, reads the user's choice and configures
+        // player1 / player2 / currentPlayer for the selected mode.
+        showMenu();
+
+        bool playAgain = true;
+
+        while (playAgain)
+        {
+            // Make sure we start the round with a clean board and
+            // player1 going first.
+            reset();
+
+            // Main turn loop: alternate turns until someone wins or
+            // the board is full.
+            while (!checkGameEnd())
+            {
+                board.display();
+
+                AIPlayer* aiTurn = dynamic_cast<AIPlayer*>(currentPlayer);
+
+                if (aiTurn != nullptr)
+                {
+                    handleAIMove(aiTurn);
+                }
+                else
+                {
+                    handleHumanMove(currentPlayer);
+                }
+
+                switchPlayer();
+            }
+
+            board.display();
+            displayResult();
+
+            // Ask the user whether to play another round in the same mode.
+            cout << "\nPlay again? (y/n): ";
+            char answer;
+            cin >> answer;
+
+            playAgain = (answer == 'y' || answer == 'Y');
+        }
+
+        cout << "\nReturning to main menu...\n" << endl;
+    }
 }
 
 
@@ -763,6 +816,45 @@ void Game::start()
 // Implement menu display and menu selection.
 void Game::showMenu()
 {
+    int choice;
+
+    cout << "\nTIC-TAC-TOE GAME\n";
+    cout << "================\n";
+    cout << "1. Player vs Player\n";
+    cout << "2. Player vs Computer (Easy)\n";
+    cout << "3. Player vs Computer (Hard)\n";
+    cout << "4. Exit\n";
+    cout << "\nSelect game mode: ";
+    cin >> choice;
+
+    while (cin.fail() || choice < 1 || choice > 4)
+    {
+        cout << "Invalid choice. Please select a valid option (1-4): ";
+        cin.clear();
+        cin.ignore(1000, '\n');
+        cin >> choice;
+    }
+
+    switch (choice)
+    {
+    case 1:
+        setupPvP();
+        break;
+
+    case 2:
+        setupPvC(EASY);
+        break;
+
+    case 3:
+        setupPvC(HARD);
+        break;
+
+    case 4:
+        cout << "\nThanks for playing! Goodbye.\n";
+        delete player1;
+        delete player2;
+        exit(0);
+    }
 }
 
 
@@ -770,6 +862,40 @@ void Game::showMenu()
 // Implement Player vs Player setup.
 void Game::setupPvP()
 {
+    string name1, name2;
+
+    // Clear any leftover newline from the previous cin >> read
+    // so getline() below doesn't read an empty line.
+    cin.ignore(1000, '\n');
+
+    cout << "\n--- Player vs Player Setup ---\n";
+
+    cout << "Enter name for Player 1 (X): ";
+    getline(cin, name1);
+    if (name1.empty())
+    {
+        name1 = "Player 1";
+    }
+
+    cout << "Enter name for Player 2 (O): ";
+    getline(cin, name2);
+    if (name2.empty())
+    {
+        name2 = "Player 2";
+    }
+
+    // Release any players from a previous mode before creating new ones.
+    delete player1;
+    delete player2;
+
+    player1 = new HumanPlayer(name1, 'X');
+    player2 = new HumanPlayer(name2, 'O');
+    aiPlayer = nullptr;
+
+    vsComputer = false;
+    currentPlayer = player1;
+
+    board.reset();
 }
 
 
@@ -777,6 +903,36 @@ void Game::setupPvP()
 // Implement Player vs Computer setup.
 void Game::setupPvC(Difficulty difficulty)
 {
+    string name;
+
+    // Clear any leftover newline from the previous cin >> read.
+    cin.ignore(1000, '\n');
+
+    cout << "\n--- Player vs Computer ("
+         << (difficulty == HARD ? "Hard" : "Easy") << ") Setup ---\n";
+
+    cout << "Enter your name (X): ";
+    getline(cin, name);
+    if (name.empty())
+    {
+        name = "Player";
+    }
+
+    // Release any players from a previous mode before creating new ones.
+    delete player1;
+    delete player2;
+
+    player1 = new HumanPlayer(name, 'X');
+
+    AIPlayer* newAI = new AIPlayer("Computer", 'O', difficulty);
+    player2 = newAI;
+    aiPlayer = newAI;
+
+    this->difficulty = difficulty;
+    vsComputer = true;
+    currentPlayer = player1;
+
+    board.reset();
 }
 
 
@@ -784,6 +940,14 @@ void Game::setupPvC(Difficulty difficulty)
 // Implement player switching.
 void Game::switchPlayer()
 {
+    if (currentPlayer == player1)
+    {
+        currentPlayer = player2;
+    }
+    else
+    {
+        currentPlayer = player1;
+    }
 }
 
 
@@ -820,6 +984,8 @@ void Game::displayResult() const
 // Implement game reset for a new round.
 void Game::reset()
 {
+    board.reset();
+    currentPlayer = player1;
 }
 
 
