@@ -181,29 +181,14 @@ public:
     // TODO - MEMBER 5:
     // Find the optimal move for HARD difficulty.
     // Research and implement the minimax algorithm as required.
-    void getBestMove(Board& board, int& row, int& col) const{
-
-    };
+    void getBestMove(Board& board, int& row, int& col) const;
 
     // TODO - MEMBER 5:
     // Evaluate the current board:
     // +10 for an AI win
     // -10 for an opponent win
     //  0 for draw/neutral state
-    int evaluateBoard(const Board& board) const{
-        //Check first if AI has won
-        if(board.checkWin(this -> symbol)){
-            return 10;
-        }
-        //Check which symbol the human opponent is to determine next steps
-        char oppSymbol = (this -> symbol == 'X') ? 'O' : 'X';
-
-        if(board.checkWin(oppSymbol)){
-            return -10;
-        }
-        return 0;
-
-    };
+    int evaluateBoard(const Board& board) const;
 };
 
 
@@ -626,11 +611,71 @@ void AIPlayer::getRandomMove(const Board& board, int& row, int& col) const
 {
 }
 
+//TODO - MEMBER 5:
+// Helper function to implement the minimax algorithm separtely
+int runMinimax(Board b, bool isMaximizing, char aiSymbol, char humanSymbol) {
+    // Base cases: check terminal states on this cloned board
+    if (b.checkWin(aiSymbol)) return 10;
+    if (b.checkWin(humanSymbol)) return -10;
+    if (b.isFull()) return 0;
+
+    int size = b.getSize();
+
+    if (isMaximizing) {
+        int bestScore = -1000;
+        for (int r = 0; r < size; r++) {
+            for (int c = 0; c < size; c++) {
+                if (b.getCell(r, c) == ' ') {
+                    Board nextBoard = b; // Clone board to avoid permanent changes
+                    nextBoard.makeMove(r, c, aiSymbol);
+                    int score = runMinimax(nextBoard, false, aiSymbol, humanSymbol);
+                    if (score > bestScore) bestScore = score;
+                }
+            }
+        }
+        return bestScore;
+    } else {
+        int bestScore = 1000;
+        for (int r = 0; r < size; r++) {
+            for (int c = 0; c < size; c++) {
+                if (b.getCell(r, c) == ' ') {
+                    Board nextBoard = b; // Clone board 
+                    nextBoard.makeMove(r, c, humanSymbol);
+                    int score = runMinimax(nextBoard, true, aiSymbol, humanSymbol);
+                    if (score < bestScore) bestScore = score;
+                }
+            }
+        }
+        return bestScore;
+    }
+}
 
 // TODO - MEMBER 5:
 // Implement optimal move selection using minimax.
 void AIPlayer::getBestMove(Board& board, int& row, int& col) const
 {
+    int bestScore = -1000;
+    char humanSymbol = (this->symbol == 'X') ? 'O' : 'X';
+    int size = board.getSize();
+
+    for (int r = 0; r < size; r++) {
+        for (int c = 0; c < size; c++) {
+            if (board.getCell(r, c) == ' ') {
+                // Make a copy of the board to simulate moves on it
+                Board tempBoard = board; 
+                tempBoard.makeMove(r, c, this->symbol);
+                
+                // Call the standalone minimax (passing false because it's human's turn next)
+                int moveScore = runMinimax(tempBoard, false, this->symbol, humanSymbol);
+                
+                if (moveScore > bestScore) {
+                    bestScore = moveScore;
+                    row = r;
+                    col = c;
+                }
+            }
+        }
+    }
 }
 
 
@@ -638,6 +683,16 @@ void AIPlayer::getBestMove(Board& board, int& row, int& col) const
 // Implement board evaluation for AI.
 int AIPlayer::evaluateBoard(const Board& board) const
 {
+    //Check first if AI has won
+    if(board.checkWin(this -> symbol)){
+        return 10;
+    }
+    //Check which symbol the human opponent is to determine next steps
+    char oppSymbol = (this -> symbol == 'X') ? 'O' : 'X';
+
+    if(board.checkWin(oppSymbol)){
+        return -10;
+    }
     return 0;
 }
 
