@@ -951,10 +951,29 @@ void Game::switchPlayer()
 }
 
 
+// ======================================// ============================================================
+// MEMBER 7 IMPLEMENTATIONS
+// ============================================================
+
 // TODO - MEMBER 7:
 // Implement human move handling.
 void Game::handleHumanMove(Player* player)
 {
+    cout << "\n--- " << player->getName() << "'s Turn (" << player->getSymbol() << ") ---\n";
+
+    int row, col;
+    while (true)
+    {
+        player->getMove(row, col);
+
+        // Validate board boundaries and ensure cell isn't already occupied
+        if (board.makeMove(row, col, player->getSymbol()))
+        {
+            break; // Valid move placed successfully
+        }
+
+        cout << "Cell (" << row + 1 << ", " << col + 1 << ") is invalid or already occupied! Try again.\n";
+    }
 }
 
 
@@ -962,6 +981,16 @@ void Game::handleHumanMove(Player* player)
 // Implement AI move handling.
 void Game::handleAIMove(AIPlayer* aiPlayer)
 {
+    cout << "\n--- " << aiPlayer->getName() << "'s Turn (" << aiPlayer->getSymbol() << ") ---\n";
+
+    int row, col;
+    aiPlayer->getMove(row, col);
+
+    board.makeMove(row, col, aiPlayer->getSymbol());
+
+    // Display chosen move in 1-based format matching human input
+    cout << aiPlayer->getName() << " placed '" << aiPlayer->getSymbol()
+         << "' at position (" << row + 1 << ", " << col + 1 << ").\n";
 }
 
 
@@ -969,6 +998,11 @@ void Game::handleAIMove(AIPlayer* aiPlayer)
 // Implement game-end checking.
 bool Game::checkGameEnd()
 {
+    // Return true if either player has won or if the board is full
+    if (board.checkWin('X') || board.checkWin('O') || board.isFull())
+    {
+        return true;
+    }
     return false;
 }
 
@@ -977,19 +1011,22 @@ bool Game::checkGameEnd()
 // Implement result display.
 void Game::displayResult() const
 {
+    cout << "\n====================\n";
+    if (board.checkWin(player1->getSymbol()))
+    {
+        cout << "  " << player1->getName() << " WINS!\n";
+    }
+    else if (board.checkWin(player2->getSymbol()))
+    {
+        cout << "  " << player2->getName() << " WINS!\n";
+    }
+    else
+    {
+        cout << "  IT'S A DRAW!\n";
+    }
+    cout << "====================\n";
 }
 
-
-// TODO - MEMBER 6:
-// Implement game reset for a new round.
-void Game::reset()
-{
-    board.reset();
-    currentPlayer = player1;
-}
-
-
-// ============================================================
 // MAIN FUNCTION
 // owner: MEMBER 6
 // ============================================================
@@ -1001,3 +1038,6 @@ int main()
 
     return 0;
 }
+
+
+
